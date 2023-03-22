@@ -2,13 +2,25 @@ from django.shortcuts import render, redirect
 from main.forms import *
 from main.models import *
 from django.db import connections
+from django.contrib import messages
+from datetime import datetime
 # Create your views here.
 
 
 def register(request):
     if request.method == 'POST':
+        format = "%Y-%d-%m-"
+        res = True
+        try:
+            res = bool(datetime.strptime(request.POST.get('date_of_birth'), format))
+        except ValueError:
+            res = False
+        if res == False:
+            messages.error(request, 'Oops, Date Format is invalid.Date format should be like this(2021-01-03)')
+            return redirect('/register')
         c_form = CustomerForm(request.POST)
         add_form = AddressForm(request.POST)
+
         if c_form.is_valid():
             first_name = request.POST.get('first_name')
             last_name = request.POST.get('last_name')
@@ -24,8 +36,11 @@ def register(request):
                 cursor.execute(
                     "SELECT id FROM main_address ORDER BY id DESC LIMIT 1")
                 last_insert_id = dictfetchall(cursor)
-                cursor.execute("INSERT INTO main_customer(first_name,last_name,age,date_of_birth,phone,email,address_id) VALUES( %s , %s ,%s , %s , %s , %s ,%s)", [
-                               first_name, last_name, age, date_of_birth, phone, email, last_insert_id[0]['id']])
+                try:
+                    cursor.execute("INSERT INTO main_customer(first_name,last_name,age,date_of_birth,phone,email,address_id) VALUES( %s , %s ,%s , %s , %s , %s ,%s)", [
+                        first_name, last_name, age, date_of_birth, phone, email, last_insert_id[0]['id']])
+                except Exception as e:
+                    print(e)
             finally:
                 cursor.close()
             return redirect('/cars')
