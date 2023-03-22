@@ -1,0 +1,16 @@
+{% extends 'main/base.html' %}
+{% block title %}Home Page{% endblock  %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div id="c_form">
+    <form action="" method="post" id="customerForm">
+        {% csrf_token %}
+        {{c_form|crispy}}
+        <strong>Address</strong><br>
+        {{add_form|crispy}}
+        <button type="button" class="btn btn-success customer">Next</button>
+    </form>
+</div>
+
+
+{% endblock  %}
