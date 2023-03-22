@@ -9,7 +9,7 @@ from datetime import datetime
 
 def register(request):
     if request.method == 'POST':
-        format = "%Y-%d-%m-"
+        format = "%Y-%d-%m"
         res = True
         try:
             res = bool(datetime.strptime(request.POST.get('date_of_birth'), format))
